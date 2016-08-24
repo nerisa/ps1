@@ -2,14 +2,17 @@ require 'open-uri'
 
 class TrendingVideosController < ApplicationController
 
-  YOUTUBE_URL = "https://www.youtube.com/feed/trending?gl=US"
+  YOUTUBE_URL = "https://www.youtube.com"
+  YOUTUBE_TRENDING_URL = "#{YOUTUBE_URL}/feed/trending?gl=US"
+  VIDEO_COUNT = 10
 
+  #Holds the necessary information of the videos
   class Video
 
     def initialize (link, title, thumbnail)
       @link = link
       @title = title
-      # @thumbnail = thumbnail
+      @thumbnail = thumbnail
     end
 
     def get_link
@@ -20,33 +23,29 @@ class TrendingVideosController < ApplicationController
       @title
     end
 
-    # def get_thumbnail
-    #   @thumbnail
-    # end
+    def get_thumbnail
+      @thumbnail
+    end
 
   end
 
   def index
-    page = Nokogiri::HTML(open(YOUTUBE_URL))
-    logger.info page
-    logger.info "===================================="
+    page = Nokogiri::HTML(open(YOUTUBE_TRENDING_URL))
+    video_count = 10
     @videos = Array.new
-    video_info = page.css('div.yt-lockup-video')
-    if video_info.respond_to?("each")
-      video_info.each do |video|
-        title = video.css('div.yt-uix-tile h3').css('a').text
-        link = video.css('div.yt-uix-tile h3').css("a")[0]["href"]
-        video_detail = Video.new(link,title, "bla")
-        @videos << video_detail
-      end
-    else
-      logger.info titles
+    video_list = page.css('div.yt-lockup-video')
+
+    if (video_list.length < video_count)
+      video_count = video_list.length
     end
 
-    @videos.each do |video|
-      logger.info (">>>>>>>>>>>>>>>>>>>>>")
-      logger.info (video.get_link)
+    for i in 0..(video_count-1)
+      title = video_list[i].css('div.yt-uix-tile h3').css('a').text
+      link = "#{YOUTUBE_URL}#{video_list[i].css('div.yt-uix-tile h3').css('a')[0]['href']}"
+      thumbnail = video_list[i].css('div.yt-uix-tile').css('div.yt-lockup-thumbnail').css('a').css('div').css('span').css('img')[0]['src']
+      video_detail = Video.new(link, title, thumbnail)
+      @videos << video_detail
     end
-
   end
+
 end
