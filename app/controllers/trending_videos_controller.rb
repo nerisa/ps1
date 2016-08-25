@@ -43,6 +43,12 @@ class TrendingVideosController < ApplicationController
       title = video_list[i].css('div.yt-uix-tile h3').css('a').text
       link = "#{YOUTUBE_URL}#{video_list[i].css('div.yt-uix-tile h3').css('a')[0]['href']}"
       thumbnail = video_list[i].css('div.yt-uix-tile').css('div.yt-lockup-thumbnail').css('a').css('div').css('span').css('img')[0]['src']
+
+      #Checks whether the image source is valid
+      if !(thumbnail.split("?")[0].include? ".jpg")
+        thumbnail = video_list[i].css('div.yt-uix-tile').css('div.yt-lockup-thumbnail').css('a').css('div').css('span').css('img')[0]['data-thumb']
+      end
+
       video_detail = Video.new(link, title, thumbnail)
       @videos << video_detail
     end

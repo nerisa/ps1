@@ -1,9 +1,15 @@
 <h1>Top 10 Trending videos from Youtube</h1>
-<ul>
+<ol>
   <% @videos.each do |video| %>
       <li>
           <img  width="196" height="110" src="<%= video.get_thumbnail %>">
           <a href="<%= video.get_link %>"><%= video.get_title %></a>
       </li>
   <% end %>
-</ul>
+</ol>
+
+<style>
+  li{
+    margin-bottom: 20px;
+  }
+</style>
